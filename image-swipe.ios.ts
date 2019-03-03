@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ***************************************************************************** */
+import { fromBase64, fromFile } from "image-source";
 import * as utils from "utils/utils";
 import { ImageSwipeBase, allowZoomProperty, itemsProperty, pageNumberProperty } from "./image-swipe-common";
 
@@ -190,7 +191,7 @@ export class ImageSwipe extends ImageSwipeBase {
         let activityIndicator: UIActivityIndicatorView;
         let view: UIView;
         let zoomScrollView: UIScrollView;
-        let image;
+        let image = null;
 
         view = UIView.alloc().init();
         view.autoresizingMask = UIViewAutoresizing.FlexibleWidth
@@ -225,8 +226,19 @@ export class ImageSwipe extends ImageSwipeBase {
         this._resizeNativeViews(page);
 
         activityIndicator.startAnimating();
+		
+        if (-1 === imageUrl.indexOf("://")) {
+            if (5 < imageUrl.length && "data:" === imageUrl.substr( 0 , 5 ) && -1 !== imageUrl.indexOf( "base64" )) {
+                image = fromBase64( imageUrl.substr( imageUrl.indexOf( "," ) + 1 ) ).ios;
+            }
+            else {
+                image = fromFile( imageUrl ).ios;
+            }
+        }
+        else {
+            image = ImageSwipeBase._imageCache.get(imageUrl);
+        }
 
-        image = ImageSwipeBase._imageCache.get(imageUrl);
         if (image) {
             this._prepareImageView(image, imageView);
             activityIndicator.stopAnimating();

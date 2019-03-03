@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ***************************************************************************** */
+import { fromBase64, fromFile } from "image-source";
 import { GestureTypes } from "ui/gestures";
 import { ImageSwipeBase, allowZoomProperty, itemsProperty, pageNumberProperty } from "./image-swipe-common";
 
@@ -202,7 +203,19 @@ class ImageSwipePageAdapter extends android.support.v4.view.PagerAdapter {
         container.addView(layout);
 
         progressBar.setVisibility(android.view.View.VISIBLE);
-        const image: android.graphics.Bitmap = ImageSwipeBase._imageCache.get(imageUrl);
+        let image: android.graphics.Bitmap = null;
+        if (-1 === imageUrl.indexOf("://")) {
+            if (5 < imageUrl.length && "data:" === imageUrl.substr( 0 , 5 ) && -1 !== imageUrl.indexOf( "base64" )) {
+                image = fromBase64( imageUrl.substr( imageUrl.indexOf( "," ) + 1 ) ).android;
+            }
+            else {
+                image = fromFile( imageUrl ).android;
+            }
+        }
+        else {
+            image = ImageSwipeBase._imageCache.get(imageUrl);
+        }
+		
         if (image) {
             imageView.setImageBitmap(image);
             progressBar.setVisibility(android.view.View.GONE);
