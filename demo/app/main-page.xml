@@ -1,7 +1,0 @@
-<Page xmlns="http://schemas.nativescript.org/tns.xsd" xmlns:is="nativescript-image-swipe" navigatingTo="navigatingTo">
-    <GridLayout>
-        <is:ImageSwipe items="{{ items }}" imageUrlProperty="imageUrl" 
-                       pageNumber="{{ pageNumber }}" pageChanged="pageChanged" backgroundColor="#000000">
-        </is:ImageSwipe>
-    </GridLayout>
-</Page>
